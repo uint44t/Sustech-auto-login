@@ -10,7 +10,7 @@
 
 请使用 Tampermonkey 脚本管理器：[官网](https://www.tampermonkey.net/)
 
-[点击此处安装此脚本](https://github.com/vollate/SUSTech-auto-login/blob/main/sustech-auto-login.user.js)
+[点击此处安装此脚本](https://raw.githubusercontent.com/vollate/SUSTech-auto-login/main/sustech-auto-login.user.js)
 
 ## 使用
 
