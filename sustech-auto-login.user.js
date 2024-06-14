@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SUSTech auto login
 // @namespace    https://blog.vollate.top/
-// @version      1.0.1
+// @version      1.0.2
 // @description  请不要在任何公共设备上使用此脚本，对于您的账号安全造成的损失，作者概不负责。
 // @author       Vollate
 // @match        https://cas.sustech.edu.cn/*
@@ -75,39 +75,26 @@
         }
     }
 
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: 'https://cas.sustech.edu.cn/cas/login',
-        onload: function (response) {
-            storeCookies(response.responseHeaders);
-
-            const text = response.responseText;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            const inputElement = doc.querySelector('input[type="hidden"][name="execution"]');
-            if (inputElement) {
-                const execution = inputElement.getAttribute('value');
-                GM_xmlhttpRequest({
-                    method: 'POST',
-                    url: 'https://cas.sustech.edu.cn/cas/login',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    data: `username=${username}&password=${password}&execution=${execution}&_eventId=submit&geolocation=`,
-                    onload: function (response) {
-                        storeCookies(response.responseHeaders);
-                        location.reload();
-                    },
-                    onerror: function (error) {
-                        console.error('Login request failed', error);
-                    }
-                });
-            } else {
-                console.log({success: false});
+    const inputElement = document.querySelector('input[type="hidden"][name="execution"]');
+    if (inputElement) {
+        const execution = inputElement.getAttribute('value');
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: 'https://cas.sustech.edu.cn/cas/login',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data: `username=${username}&password=${password}&execution=${execution}&_eventId=submit&geolocation=`,
+            onload: function (response) {
+                storeCookies(response.responseHeaders);
+                location.reload();
+            },
+            onerror: function (error) {
+                console.error('Login request failed', error);
             }
-        },
-        onerror: function (error) {
-            console.error('Initial GET request failed', error);
-        }
-    });
-})();
+        });
+    } else {
+        console.log({success: false});
+    }
+})
+();
