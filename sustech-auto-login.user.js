@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SUSTech auto login
-// @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @namespace    https://blog.vollate.top/
+// @version      1.0.1
 // @description  请不要在任何公共设备上使用此脚本，对于您的账号安全造成的损失，作者概不负责。
 // @author       Vollate
 // @match        https://cas.sustech.edu.cn/*
@@ -67,7 +67,7 @@
         if (setCookieHeaders.length) {
             setCookieHeaders.forEach(header => {
                 const cookie = header.substring(12).split(';')[0].trim();
-                if (cookie && !cookie.endsWith('=""') && !cookie.endsWith('=')) { // 忽略空的 cookie
+                if (cookie && !cookie.endsWith('=""') && !cookie.endsWith('=')) {
                     console.log('Set cookie:', cookie);
                     document.cookie = cookie;
                 }
