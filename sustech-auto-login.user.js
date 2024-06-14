@@ -96,7 +96,6 @@
                     data: `username=${username}&password=${password}&execution=${execution}&_eventId=submit&geolocation=`,
                     onload: function (response) {
                         storeCookies(response.responseHeaders);
-                        console.log(response.responseText);
                         location.reload();
                     },
                     onerror: function (error) {
