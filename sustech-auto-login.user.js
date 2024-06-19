@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SUSTech auto login
 // @namespace    https://blog.vollate.top/
-// @version      1.0.2
+// @version      1.0.3
 // @description  请不要在任何公共设备上使用此脚本，对于您的账号安全造成的损失，作者概不负责。
 // @author       Vollate
 // @match        https://cas.sustech.edu.cn/*
@@ -15,6 +15,23 @@
 
 (function () {
     'use strict';
+
+    function autoLoginLog(msg) {
+        console.log(`[SUSTech Auto Login]: ${msg}`);
+    }
+
+    GM_registerMenuCommand('CAS Login Settings', createSettingsDialog);
+
+    const username = GM_getValue('username', '');
+    const password = GM_getValue('password', '');
+
+    if (!username || !password) {
+        autoLoginLog('Please enter your credentials using the menu option.');
+        return;
+    } else if (document.documentURI.split('?service').length === 1) {
+        autoLoginLog('avoid non redirect auto login');
+        return;
+    }
 
     function createSettingsDialog() {
         const container = document.createElement('div');
@@ -51,16 +68,6 @@
         });
     }
 
-    GM_registerMenuCommand('CAS Login Settings', createSettingsDialog);
-
-    const username = GM_getValue('username', '');
-    const password = GM_getValue('password', '');
-
-    if (!username || !password) {
-        console.log('Please enter your credentials using the menu option.');
-        return;
-    }
-
     function storeCookies(responseHeaders) {
         const headersArray = responseHeaders.split('\n');
         const setCookieHeaders = headersArray.filter(header => header.toLowerCase().startsWith('set-cookie:'));
@@ -68,7 +75,7 @@
             setCookieHeaders.forEach(header => {
                 const cookie = header.substring(12).split(';')[0].trim();
                 if (cookie && !cookie.endsWith('=""') && !cookie.endsWith('=')) {
-                    console.log('Set cookie:', cookie);
+                    autoLoginLog('Set cookie:', cookie);
                     document.cookie = cookie;
                 }
             });
@@ -94,7 +101,7 @@
             }
         });
     } else {
-        console.log({success: false});
+        autoLoginLog({success: false});
     }
 })
 ();
