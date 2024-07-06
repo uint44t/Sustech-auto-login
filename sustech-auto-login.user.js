@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         SUSTech auto login
 // @namespace    https://blog.vollate.top/
-// @version      1.0.3
+// @version      1.1.3
 // @description  请不要在任何公共设备上使用此脚本，对于您的账号安全造成的损失，作者概不负责。
 // @author       Vollate
 // @match        https://cas.sustech.edu.cn/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=sustech.edu.cn
+// @run-at       document-end
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -18,19 +19,6 @@
 
     function autoLoginLog(msg) {
         console.log(`[SUSTech Auto Login]: ${msg}`);
-    }
-
-    GM_registerMenuCommand('CAS Login Settings', createSettingsDialog);
-
-    const username = GM_getValue('username', '');
-    const password = GM_getValue('password', '');
-
-    if (!username || !password) {
-        autoLoginLog('Please enter your credentials using the menu option.');
-        return;
-    } else if (document.documentURI.split('?service').length === 1) {
-        autoLoginLog('avoid non redirect auto login');
-        return;
     }
 
     function createSettingsDialog() {
@@ -68,18 +56,29 @@
         });
     }
 
+    GM_registerMenuCommand('CAS Login Settings', createSettingsDialog);
+
+    const username = GM_getValue('username', '');
+    const password = GM_getValue('password', '');
+
+    if (!username || !password) {
+        autoLoginLog('Please enter your credentials using the menu option.');
+        return;
+    } else if (document.documentURI.split('?service').length === 1) {
+        autoLoginLog('Avoid non-redirect auto login');
+        return;
+    }
+
     function storeCookies(responseHeaders) {
         const headersArray = responseHeaders.split('\n');
-        const setCookieHeaders = headersArray.filter(header => header.toLowerCase().startsWith('set-cookie:'));
-        if (setCookieHeaders.length) {
-            setCookieHeaders.forEach(header => {
+        headersArray.forEach(header => {
+            if (header.toLowerCase().startsWith('set-cookie:')) {
                 const cookie = header.substring(12).split(';')[0].trim();
                 if (cookie && !cookie.endsWith('=""') && !cookie.endsWith('=')) {
-                    autoLoginLog('Set cookie:', cookie);
                     document.cookie = cookie;
                 }
-            });
-        }
+            }
+        });
     }
 
     const inputElement = document.querySelector('input[type="hidden"][name="execution"]');
@@ -97,11 +96,10 @@
                 location.reload();
             },
             onerror: function (error) {
-                console.error('Login request failed', error);
+                console.error('[SUSTech Auto Login]: Login request failed', error);
             }
         });
     } else {
-        autoLoginLog({success: false});
+        autoLoginLog('Execution element not found');
     }
-})
-();
+})();
